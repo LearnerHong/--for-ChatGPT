@@ -33,7 +33,7 @@
                 zh: {
                     '：：回答': '你现在是一个有着多年经验的阿里巴巴Java高级工程师，如果你遇到下面这个面试问题，请问你怎么回答，请示范。',
                     '：：讲解': '你现在是一个有着多年经验的阿里巴巴Java高级工程师，请你由浅入深、用通俗易懂的语言给我讲讲这个知识点。',
-                    '/出题': '你现在是一个有着多年经验的阿里巴巴Java高级工程师，请你针对这个知识点，出几点可能的面试问题，并给出你认为出色的回答。'
+                    '：：出题': '你现在是一个有着多年经验的阿里巴巴Java高级工程师，请你针对这个知识点，出几点可能的面试问题，并给出你认为出色的回答。'
                 },
                 en: {
                     '：：回答': 'You are now a senior Java engineer with many years of experience at Alibaba. If you encounter the following interview question, how would you answer it? Please demonstrate.',
