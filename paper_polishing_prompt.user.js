@@ -15,7 +15,7 @@
 (function() {
     'use strict';
 
-    const inputSelector = '在此处添加输入框的选择器'; // 根据ChatGPT页面的实际情况填写
+    const inputSelector = 'input[type="text"], textarea';  // 根据ChatGPT页面的实际情况填写
 
     const prompts = {
         '/version': 'Please provide multiple versions for reference.',
