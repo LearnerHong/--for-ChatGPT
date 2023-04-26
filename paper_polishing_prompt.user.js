@@ -45,6 +45,9 @@
     // 添加选择框到页面
     const selectBox = document.createElement('select');
     selectBox.id = 'prompt-category';
+    selectBox.style.position = "fixed";
+    selectBox.style.top = "10px";
+    selectBox.style.left = "10px";
     selectBox.innerHTML = `
       <option value="interview-en">面试 (英文)</option>
       <option value="interview-zh">面试 (中文)</option>
@@ -53,15 +56,21 @@
     `;
     document.body.appendChild(selectBox);
 
-    document.querySelector(inputSelector).addEventListener('input', (event) => {
-        const inputElement = event.target;
-        const inputValue = inputElement.value;
-        const selectedCategory = document.querySelector('#prompt-category').value;
-        const [category, language] = selectedCategory.split('-');
+    const chatInputElement = document.querySelector(inputSelector);
 
-        if (inputValue in promptSets[category][language]) {
-            inputElement.value = promptSets[category][language][inputValue];
-            event.preventDefault();
-        }
-    });
-})();
+    if(chatInputElement) {
+        chatInputElement.addEventListener('input', (event) => {
+            const inputElement = event.target;
+            const inputValue = inputElement.value;
+            const selectedCategory = document.querySelector('#prompt-category').value;
+            const [category, language] = selectedCategory.split('-');
+
+            if (inputValue in promptSets[category][language]) {
+               inputElement.value = promptSets[category][language][inputValue];
+               event.preventDefault();
+            }
+        });
+    } else {
+        console.error('Chat input element not found.');
+    }
+    })();
