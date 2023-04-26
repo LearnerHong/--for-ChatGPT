@@ -4,7 +4,7 @@
 // @version      1.0
 // @description  在ChatGPT页面上提供论文润色提示词
 // @author       Your Name
-// @match        https://*.openai.com/*
+// @match        https://*/*
 // @grant        GM_addStyle
 // ==/UserScript==
 
