@@ -6,7 +6,8 @@
 // @author       Your Name
 // @match        https://*/*
 // @grant        none
-// @updateURL    https://raw.githubusercontent.com/LearnerHong/Paper-polishing-for-ChatGPT/paper_polishing_prompt.user.js
+// @updateURL https://raw.githubusercontent.com/LearnerHong/Paper-polishing-for-ChatGPT/main/paper_polishing_prompt.user.js
+
 
 
 // ==/UserScript==
