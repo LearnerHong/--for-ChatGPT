@@ -1,20 +1,32 @@
 // ==UserScript==
-// @name         论文润色提示词 for ChatGPT
+// @name         DIY ChatGPT提示
 // @namespace    http://tampermonkey.net/
 // @version      1.0
 // @description  在ChatGPT页面上提供论文润色提示词
-// @author       Your Name
-// @match        https://*/*
+// @author       江鸟1998
+// @match        https://*.openai.com/*
 // @grant        GM_addStyle
 // ==/UserScript==
 
 (function () {
     'use strict';
 
-    const inputElement = document.querySelector('input[type="text"], textarea');
+    function setupKeyListener(inputElement) {
+        if (!inputElement) return;
 
-    if (inputElement) {
+        const existingListener = inputElement.getAttribute('data-keyup-setup');
+        if (existingListener) return;
+
+        inputElement.setAttribute('data-keyup-setup', 'true');
+
         GM_addStyle('.prompt-selector { position: absolute; top: 0; left: -200px; z-index: 1000; }');
+
+        GM_addStyle('.suggestions-container { position: absolute; top: 100%; left: 0; background-color: #fff; border: 0px solid #ccc; padding: 4px; }');
+        GM_addStyle('.suggestions-container.hidden { display: none; }');
+        GM_addStyle('.suggestion:hover { background-color: #eee; }');
+        GM_addStyle('.suggestion { padding: 4px; cursor: pointer; display: inline-block; }');
+
+
 
         const promptSelectorDiv = document.createElement('div');
         promptSelectorDiv.className = 'prompt-selector';
@@ -28,12 +40,19 @@
         languageSelector.innerHTML = '<option value="zh">中文</option><option value="en">英文</option>';
         promptSelectorDiv.appendChild(languageSelector);
 
+        // 添加建议提示词容器
+        const suggestionsContainer = document.createElement('div');
+        suggestionsContainer.className = 'suggestions-container';
+        inputElement.parentElement.appendChild(suggestionsContainer);
+
+
         const promptSets = {
             interview: {
                 zh: {
-                    '：：回答': '你现在是一个有着多年经验的阿里巴巴Java高级工程师，如果你遇到下面这个面试问题，请问你怎么回答，请示范。',
-                    '：：讲解': '你现在是一个有着多年经验的阿里巴巴Java高级工程师，请你由浅入深、用通俗易懂的语言给我讲讲这个知识点。',
-                    '：：出题': '你现在是一个有着多年经验的阿里巴巴Java高级工程师，请你针对这个知识点，出几点可能的面试问题，并给出你认为出色的回答。'
+                    '：：回答': '你现在是一个有着多年经验的阿里巴巴Java高级工程师，如果你遇到这个面试问题，请问你怎么回答才能赢得面试官的青睐，请现场示范。',
+                    '：：讲解': '你现在是一个有着多年经验的阿里巴巴Java高级工程师，请你由浅入深、用通俗易懂的语言给我讲讲这个知识点',
+                    '：：出题': '你现在是一个有着多年经验的阿里巴巴Java高级工程师，请你针对这个知识点，出几点可能的面试问题，并给出你认为出色的回答。',
+                    '：：案例': '你现在是一个有着多年经验的阿里巴巴Java高级工程师，请你针对这个知识点，举出一个生动形象的实际例子来展示，以便于我理解'
                 },
                 en: {
                     '：：回答': 'You are now a senior Java engineer with many years of experience at Alibaba. If you encounter the following interview question, how would you answer it? Please demonstrate.',
@@ -54,23 +73,93 @@
                 }
             }
         };
+        inputElement.addEventListener('keyup', (event) => keyUpEventHandler(inputElement, categorySelector, languageSelector, promptSets, suggestionsContainer));
+    }
 
-        inputElement.addEventListener('keyup', (event) => {
-            const category = categorySelector.value;
-            const language = languageSelector.value;
-            const cursorPosition = inputElement.selectionStart;
-            const inputValue = inputElement.value.slice(0, cursorPosition);
+    function keyUpEventHandler(inputElement, categorySelector, languageSelector, promptSets, suggestionsContainer) {
+        suggestionsContainer.className = 'suggestions-container hidden';
+        // 清除旧的建议
+        suggestionsContainer.innerHTML = '';
 
+        const category = categorySelector.value;
+        const language = languageSelector.value;
+        const cursorPosition = inputElement.selectionStart;
+        const inputValue = inputElement.value.slice(0, cursorPosition);
+
+
+        // 检查输入是否以`：：`结尾
+        if (inputValue.endsWith('：：')) {
+            suggestionsContainer.classList.remove('hidden');
+            let index = 1;
             for (const key in promptSets[category][language]) {
-                if (inputValue.endsWith(key)) {
-                    const beforeKey = inputValue.slice(0, cursorPosition - key.length);
+                const suggestion = document.createElement('div');
+                suggestion.textContent = index + '. ' + key.replace('：：', '');
+                suggestion.className = 'suggestion';
+                suggestion.setAttribute('data-index', index);
+                suggestion.addEventListener('click', () => {
+                    const beforeKey = inputValue.slice(0, cursorPosition - 2);
                     const afterKey = inputElement.value.slice(cursorPosition);
                     inputElement.value = beforeKey + promptSets[category][language][key] + afterKey;
-                    inputElement.selectionStart = cursorPosition - key.length + promptSets[category][language][key].length;
-                    inputElement.selectionEnd = cursorPosition - key.length + promptSets[category][language][key].length;
+                    inputElement.selectionStart = cursorPosition - 2 + promptSets[category][language][key].length;
+                    inputElement.selectionEnd = cursorPosition - 2 + promptSets[category][language][key].length;
+                    suggestionsContainer.innerHTML = ''; // 隐藏建议列表
+                });
+                suggestionsContainer.appendChild(suggestion);
+                index++;
+            }
+        } else {
+            suggestionsContainer.classList.add('hidden');
+            // 检查输入是否以 `：：` + 编号 结尾
+            let promptInserted = false;
+            let index = 1;
+            for (const key in promptSets[category][language]) {
+                const indexString = '：：' + index;
+                if (inputValue.endsWith(indexString)) {
+                    const beforeKey = inputValue.slice(0, cursorPosition - indexString.length);
+                    const afterKey = inputElement.value.slice(cursorPosition);
+                    inputElement.value = beforeKey + promptSets[category][language][key] + afterKey;
+                    inputElement.selectionStart = cursorPosition - indexString.length + promptSets[category][language][key].length;
+                    inputElement.selectionEnd = cursorPosition - indexString.length + promptSets[category][language][key].length;
+                    promptInserted = true;
                     break;
                 }
+                index++;
+            }
+
+            // 如果不是 `：：` + 编号 结尾，正常处理 Prompt 插入
+            if (!promptInserted) {
+                for (const key in promptSets[category][language]) {
+                    if (inputValue.endsWith(key)) {
+                        const beforeKey = inputValue.slice(0, cursorPosition - key.length);
+                        const afterKey = inputElement.value.slice(cursorPosition);
+                        inputElement.value = beforeKey + promptSets[category][language][key] + afterKey;
+                        inputElement.selectionStart = cursorPosition - key.length + promptSets[category][language][key].length;
+                        inputElement.selectionEnd = cursorPosition - key.length + promptSets[category][language][key].length;
+                        break;
+                    }
+                }
+            }
+        }
+    }
+
+
+    function setupSelector() {
+        const inputElement = document.querySelector('input[type="text"], textarea');
+        if (!inputElement) return;
+
+        setupKeyListener(inputElement);
+    }
+
+    setupSelector();
+
+    const observer = new MutationObserver((mutations) => {
+        mutations.forEach((mutation) => {
+            if (mutation.type === 'childList') {
+                setupSelector();
             }
         });
-    }
+    });
+
+    const targetNode = document.querySelector('body');
+    observer.observe(targetNode, { childList: true, subtree: true });
 })();
