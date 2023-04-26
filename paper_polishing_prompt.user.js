@@ -4,7 +4,7 @@
 // @version      1.0
 // @description  在ChatGPT页面上提供论文润色提示词
 // @author       Your Name
-// @match        https://*/*
+// @match        https://*.openai.com/*
 // @grant        GM_addStyle
 // ==/UserScript==
 
@@ -12,23 +12,7 @@
     'use strict';
 
     const inputElement = document.querySelector('input[type="text"], textarea');
-    document.querySelector(inputSelector).addEventListener('keyup', (event) => {
-    const inputElement = event.target;
-    const cursorPosition = inputElement.selectionStart;
-    const inputValue = inputElement.value.slice(0, cursorPosition);
-
-    for (const key in prompts) {
-        if (inputValue.endsWith(key)) {
-            const beforeKey = inputValue.slice(0, cursorPosition - key.length);
-            const afterKey = inputElement.value.slice(cursorPosition);
-            inputElement.value = beforeKey + prompts[key] + afterKey;
-            inputElement.selectionStart = cursorPosition - key.length + prompts[key].length;
-            inputElement.selectionEnd = cursorPosition - key.length + prompts[key].length;
-            break;
-        }
-    }
-    });
-
+    
     if (inputElement) {
         GM_addStyle('.prompt-selector { position: absolute; top: 0; left: -200px; z-index: 1000; }');
 
@@ -70,18 +54,24 @@
                 }
             }
         };
+               
 
-        inputElement.addEventListener('input', (event) => {
-            const category = categorySelector.value;
-            const language = languageSelector.value;
-            const inputValue = event.target.value;
+        inputElement.addEventListener('keyup', (event) => {
+        const category = categorySelector.value;
+        const language = languageSelector.value;
+        const cursorPosition = inputElement.selectionStart;
+        const inputValue = inputElement.value.slice(0, cursorPosition);
 
-            if (inputValue in promptSets[category][language]) {
-                inputElement.value = promptSets[category][language][inputValue];
-                event.preventDefault();
+        for (const key in promptSets[category][language]) {
+            if (inputValue.endsWith(key)) {
+                const beforeKey = inputValue.slice(0, cursorPosition - key.length);
+                const afterKey = inputElement.value.slice(cursorPosition);
+                inputElement.value = beforeKey + promptSets[category][language][key] + afterKey;
+                inputElement.selectionStart = cursorPosition - key.length + promptSets[category][language][key].length;
+                inputElement.selectionEnd = cursorPosition - key.length + promptSets[category][language][key].length;
+                break;
             }
-        });
-    } else {
-        console.error('Chat input element not found.');
-    }
+        }
+    });
+        
 })();
