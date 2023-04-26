@@ -7,6 +7,8 @@
 // @match        https://*/*
 // @grant        none
 // @updateURL https://raw.githubusercontent.com/LearnerHong/Paper-polishing-for-ChatGPT/main/paper_polishing_prompt.user.js
+// @downloadURL https://raw.githubusercontent.com/LearnerHong/Paper-polishing-for-ChatGPT/main/paper_polishing_prompt
+
 
 
 
@@ -15,7 +17,7 @@
 (function() {
     'use strict';
 
-    const inputSelector = 'input[type="text"], textarea';  // 根据ChatGPT页面的实际情况填写
+    const inputSelector = 'input[type="text"], textarea';// 根据ChatGPT页面的实际情况填写
 
     const prompts = {
         '/version': 'Please provide multiple versions for reference.',
