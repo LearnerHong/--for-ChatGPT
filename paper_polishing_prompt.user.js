@@ -1,9 +1,9 @@
 // ==UserScript==
-// @name         DIY ChatGPT提示
+// @name         DIY ChatGPT Prompt
 // @namespace    http://tampermonkey.net/
 // @version      1.0
-// @description  在ChatGPT页面上提供论文润色提示词
-// @author       江鸟1998
+// @description  自定义提示词快捷方式
+// @author       江鸟莫凡
 // @match        https://*.openai.com/*
 // @grant        GM_addStyle
 // ==/UserScript==
