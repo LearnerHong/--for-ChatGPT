@@ -12,6 +12,23 @@
     'use strict';
 
     const inputElement = document.querySelector('input[type="text"], textarea');
+    document.querySelector(inputSelector).addEventListener('keyup', (event) => {
+    const inputElement = event.target;
+    const cursorPosition = inputElement.selectionStart;
+    const inputValue = inputElement.value.slice(0, cursorPosition);
+
+    for (const key in prompts) {
+        if (inputValue.endsWith(key)) {
+            const beforeKey = inputValue.slice(0, cursorPosition - key.length);
+            const afterKey = inputElement.value.slice(cursorPosition);
+            inputElement.value = beforeKey + prompts[key] + afterKey;
+            inputElement.selectionStart = cursorPosition - key.length + prompts[key].length;
+            inputElement.selectionEnd = cursorPosition - key.length + prompts[key].length;
+            break;
+        }
+    }
+    });
+
     if (inputElement) {
         GM_addStyle('.prompt-selector { position: absolute; top: 0; left: -200px; z-index: 1000; }');
 
