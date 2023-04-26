@@ -12,7 +12,7 @@
     'use strict';
 
     const inputElement = document.querySelector('input[type="text"], textarea');
-    
+
     if (inputElement) {
         GM_addStyle('.prompt-selector { position: absolute; top: 0; left: -200px; z-index: 1000; }');
 
@@ -54,24 +54,23 @@
                 }
             }
         };
-               
 
         inputElement.addEventListener('keyup', (event) => {
-        const category = categorySelector.value;
-        const language = languageSelector.value;
-        const cursorPosition = inputElement.selectionStart;
-        const inputValue = inputElement.value.slice(0, cursorPosition);
+            const category = categorySelector.value;
+            const language = languageSelector.value;
+            const cursorPosition = inputElement.selectionStart;
+            const inputValue = inputElement.value.slice(0, cursorPosition);
 
-        for (const key in promptSets[category][language]) {
-            if (inputValue.endsWith(key)) {
-                const beforeKey = inputValue.slice(0, cursorPosition - key.length);
-                const afterKey = inputElement.value.slice(cursorPosition);
-                inputElement.value = beforeKey + promptSets[category][language][key] + afterKey;
-                inputElement.selectionStart = cursorPosition - key.length + promptSets[category][language][key].length;
-                inputElement.selectionEnd = cursorPosition - key.length + promptSets[category][language][key].length;
-                break;
+            for (const key in promptSets[category][language]) {
+                if (inputValue.endsWith(key)) {
+                    const beforeKey = inputValue.slice(0, cursorPosition - key.length);
+                    const afterKey = inputElement.value.slice(cursorPosition);
+                    inputElement.value = beforeKey + promptSets[category][language][key] + afterKey;
+                    inputElement.selectionStart = cursorPosition - key.length + promptSets[category][language][key].length;
+                    inputElement.selectionEnd = cursorPosition - key.length + promptSets[category][language][key].length;
+                    break;
+                }
             }
-        }
-    });
-        
-}})();
+        });
+    }
+})();
